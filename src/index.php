@@ -17,13 +17,7 @@ foreach ($out as $j){
     }
 
 }
-$result = array_unique($elNotFound);
-print_r($result);
 
-
-foreach ($result as $iit){
-    print_r("Элемент ".$iit." не найден"."<br>");
-}
 
 ?>
 
