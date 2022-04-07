@@ -5,9 +5,7 @@ $xmlObject = simplexml_load_string($info);
 $out = ['AUD','AZN','KZT','JOPA'];
 $elNotFound=[];
 foreach ($out as $j){
-565
-565
-56
+565lpkp[k[ojonkon]]
 
 }
 
