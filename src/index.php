@@ -1,6 +1,4 @@
 <?php
-$myKey = 'ac9924cf8642f15466ae058f332d6698';
-
 $info = file_get_contents('https://www.cbr-xml-daily.ru/daily.xml', true);
 
 $xmlObject = simplexml_load_string($info);
