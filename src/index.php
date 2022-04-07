@@ -15,7 +15,6 @@ foreach ($out as $j){
             print_r("Value: " . $lis->Value . "<br>");
         } else {
             $elNotFound[] = $j;
-
         }
     }
 
