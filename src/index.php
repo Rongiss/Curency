@@ -2,6 +2,8 @@
 $data = file_get_contents('https://www.cbr-xml-daily.ru/daily.xml', true);
 $xmlObject = simplexml_load_string($data);
 
+
+  
 $find = ['AUD','AZN','KZT','JOPA'];
 $not_found=[];
 foreach ($find as $find_one){
@@ -9,6 +11,7 @@ foreach ($find as $find_one){
     foreach ($xmlObject as $lis) {
 
         if ($find_one == $lis->CharCode) {
+
             $total += 1;
             print_r("Valute: " . $lis->Name . ' ');
             print_r("ID: " . $lis->CharCode . " ");
@@ -16,7 +19,9 @@ foreach ($find as $find_one){
         }
     }
     if ($total == 0){
+
         $not_found[] = $find_one;
+
     }
 
 }
