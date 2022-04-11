@@ -1,50 +1,6 @@
 <?php
 
-/*class Parser
-{
-    protected $not_found;
-    protected $count;
-    protected $resource_objects = [];
-    protected $searched_values = [];
 
-    public function addToFind($find) {
-        if(is_array($find)) {
-            $this->searched_values = array_merge($this->searched_values, $find);
-        } else {
-            $this->searched_values[] = $find;
-        }
-
-    }
-
-    public function addResource(ResourceInterface $resource_object) {
-        $this->resource_objects[] = $resource_object;
-    }
-
-
-
-
-    public function getCommonCount() {
-
-    }
-
-    public function getNotFoundCount() {
-        $count = 0;
-        foreach ($this->resource_objects as $resource) {
-            $count+= $resource->getNotFoundCount();
-        }
-        return $count;
-    }
-
-
-    public function find() {
-        $data = [];
-        foreach ($this->resource_objects as $resource) {
-            $data = array_merge($data, $resource->getData());
-        }
-        return $data;
-    }
-}
-*/
 abstract class Resource implements ResourceInterface
 {
     protected $searched_values = [];
@@ -52,17 +8,6 @@ abstract class Resource implements ResourceInterface
     {
 
     }
-
-
-    /*public function getNotFoundCount()
-    {
-
-    }
-
-    public function getCommonCount()
-    {
-        return count($this->searched_values);
-    }*/
 }
 
 
@@ -72,6 +17,7 @@ class CBR extends Resource
     protected $data;
     protected $found = [];
     protected $not_found = [];
+    protected $find_all = true;
 
     public function __construct($url)
     {
@@ -85,6 +31,9 @@ class CBR extends Resource
     }
 
     public function find($searched_values) {
+        if($searched_values) {
+            $this->find_all = false;
+        }
         $this->searched_values = array_merge($this->searched_values,$searched_values);
     }
 
@@ -103,23 +52,44 @@ class CBR extends Resource
     private function parseData() {
         $arr = [];
         $found = [];
-        foreach ($this->data as $data) {
-            if(in_array($data->CharCode,$this->searched_values)) {
+        if($this->find_all) {
+            foreach ($this->data as $data) {
                 $arr[] = new Data($data->Name,$data->CharCode,$data->Value);
-                $found[] = $data->CharCode;
+            }
+        } else {
+            foreach ($this->data as $data) {
+                if(in_array($data->CharCode,$this->searched_values)) {
+                    $arr[] = new Data($data->Name,$data->CharCode,$data->Value);
+                    $found[] = $data->CharCode;
+                }
             }
         }
+
         $this->not_found = array_diff($this->searched_values,$found);
         $this->found = $arr;
         return $arr;
+    }
+
+    public function getCountFind() {
+        return count($this->found);
+    }
+
+    public function getCountNotFound() {
+        return count($this->not_found);
+    }
+
+    public function getCountAll() {
+        return count($this->searched_values);
+    }
+
+    public function printStatistics() {
+        return 'Всего: '.$this->getCountAll() . ' Найдено: '.$this->getCountFind().' Не найдено: '.$this->getCountNotFound().PHP_EOL;
     }
 }
 
 
 interface ResourceInterface {
     public function getData();
-    //public function getCommonCount();
-    //public function getNotFoundCount();
 }
 
 
@@ -144,31 +114,12 @@ class Data
 }
 
 
-//$parser = new Parser();
-
 $cbr = new CBR('https://www.cbr-xml-daily.ru/daily.xml');
-$cbr->find(['AUD','KZT','JOPA']);
+$cbr->find(['AUD']);
+$cbr->find(['KZT','JOPA']);
 $cbr->getData();
 
 echo $cbr->printFound();
 echo $cbr->printNotFound();
+echo $cbr->printStatistics();
 
-
-
-
-;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-?>
