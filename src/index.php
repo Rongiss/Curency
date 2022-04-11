@@ -7,15 +7,18 @@ $xmlObject = simplexml_load_string($info);
 $out = ['AUD','AZN','KZT','JOPA'];
 $elNotFound=[];
 foreach ($out as $j){
+    $total = 0;
     foreach ($xmlObject as $lis) {
-        if ($j == $lis->CharCode) {
 
+        if ($j == $lis->CharCode) {
+            $total += 1;
             print_r("Valute: " . $lis->Name . ' ');
             print_r("ID: " . $lis->CharCode . " ");
             print_r("Value: " . $lis->Value . "<br>");
-        } else {
-            $elNotFound[] = $j;
         }
+    }
+    if ($total == 0){
+        $elNotFound[] = $j;
     }
 
 }
