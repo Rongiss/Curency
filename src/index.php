@@ -1,23 +1,19 @@
 <?php
 
+interface ResourceInterface {
+    public function getData();
+}
+
+
 
 abstract class Resource implements ResourceInterface
 {
     protected $searched_values = [];
-    public function getData()
-    {
-
-    }
-}
-
-
-class CBR extends Resource
-{
     protected $url;
     protected $data;
+    protected $find_all = true;
     protected $found = [];
     protected $not_found = [];
-    protected $find_all = true;
 
     public function __construct($url)
     {
@@ -26,8 +22,7 @@ class CBR extends Resource
 
     public function getData()
     {
-        $this->data = simplexml_load_string(file_get_contents($this->url));
-        return $this->parseData();
+        return $this->data;
     }
 
     public function find($searched_values) {
@@ -36,6 +31,17 @@ class CBR extends Resource
         }
         $this->searched_values = array_merge($this->searched_values,$searched_values);
     }
+}
+
+
+class CBR extends Resource
+{
+    public function getData()
+    {
+        $this->data = simplexml_load_string(file_get_contents($this->url));
+        return $this->parseData();
+    }
+
 
     public function printNotFound() {
         foreach ($this->not_found as $value) {
@@ -87,10 +93,29 @@ class CBR extends Resource
     }
 }
 
+class Coingecko extends Resource
+{
+    public function getData()
+    {
+        return $this->parseData(json_decode(file_get_contents($this->url)));
+    }
 
-interface ResourceInterface {
-    public function getData();
+    public function parseData($data) {
+        $arr = [];
+        foreach ($data as $dat) {
+            if(in_array($dat->symbol,$this->searched_values)) {
+                $arr[] = new Data($dat->name,$dat->symbol,0);
+               // $found[] = $dat->CharCode;
+            }
+        }
+        return $arr;
+    }
+
+    public function setMethod($method) {
+        $this->url.=$method;
+    }
 }
+
 
 
 
@@ -114,12 +139,27 @@ class Data
 }
 
 
-$cbr = new CBR('https://www.cbr-xml-daily.ru/daily.xml');
+
+
+/*$cbr = new CBR('https://www.cbr-xml-daily.ru/daily.xml');
 $cbr->find(['AUD']);
 $cbr->find(['KZT','JOPA']);
 $cbr->getData();
 
-echo $cbr->printFound();
-echo $cbr->printNotFound();
-echo $cbr->printStatistics();
+//echo $cbr->printFound();
+//echo $cbr->printNotFound();
+//echo $cbr->printStatistics();
+
+
+
+$crypto = new Coingecko('https://api.coingecko.com/api/v3/');
+$crypto->setMethod('/coins/list');
+$crypto->find(['doge','btc']);
+
+
+$crypto_data = $crypto->getData();
+print_r($crypto_data);
+*/
+
+
 
